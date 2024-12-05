@@ -1,0 +1,64 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Management App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-roboto">
+<nav class="bg-blue-600 p-4">
+  <div class="container mx-auto flex justify-between items-center">
+    <a class="text-white text-xl font-bold" href="#">Task Management App</a>
+    <div>
+      <a class="text-white mr-4" href="/tasks">Tasks</a>
+      <a class="text-white" href="/logout">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<section class="py-8">
+  <div class="container mx-auto">
+    <h1 class="text-3xl font-bold text-center mb-8">Your Tasks</h1>
+    <div class="mb-4 text-center">
+      <a href="/tasks/create" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700">Create New Task</a>
+    </div>
+    <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+      <thead class="bg-gray-200">
+      <tr>
+        <th class="py-2 px-4">Title</th>
+        <th class="py-2 px-4">Description</th>
+        <th class="py-2 px-4">Due Date</th>
+        <th class="py-2 px-4">Status</th>
+        <th class="py-2 px-4">Priority</th>
+        <th class="py-2 px-4">Category</th>
+        <th class="py-2 px-4">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="task : ${tasks}" class="border-b">
+        <td class="py-2 px-4" th:text="${task.title}"></td>
+        <td class="py-2 px-4" th:text="${task.description}"></td>
+        <td class="py-2 px-4" th:text="${task.dueDate}"></td>
+        <td class="py-2 px-4" th:text="${task.status}"></td>
+        <td class="py-2 px-4" th:text="${task.priority}"></td>
+        <td class="py-2 px-4" th:text="${task.category.name}"></td>
+        <td class="py-2 px-4 flex space-x-2">
+          <a th:href="@{/tasks/{id}(id=${task.id})}" class="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-700"><i class="fas fa-eye"></i> View</a>
+          <a th:href="@{/tasks/{id}/edit(id=${task.id})}" class="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-700"><i class="fas fa-edit"></i> Edit</a>
+          <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post" class="inline">
+            <button type="submit" class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-700"><i class="fas fa-trash"></i> Delete</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer class="bg-blue-600 text-white text-center py-4">
+  <p>&copy; 2023 Task Management App</p>
+</footer>
+
+</body>
+</html>

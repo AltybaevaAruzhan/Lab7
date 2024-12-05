@@ -1,0 +1,51 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-roboto">
+<section class="py-8">
+    <div class="container mx-auto px-4">
+        <h1 class="text-3xl font-bold text-center mb-6">Task Details</h1>
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <table class="min-w-full bg-white">
+                <tbody>
+                <tr>
+                    <th class="py-2 px-4 border-b text-left">Title</th>
+                    <td class="py-2 px-4 border-b" th:text="${task.title}"></td>
+                </tr>
+                <tr>
+                    <th class="py-2 px-4 border-b text-left">Description</th>
+                    <td class="py-2 px-4 border-b" th:text="${task.description}"></td>
+                </tr>
+                <tr>
+                    <th class="py-2 px-4 border-b text-left">Due Date</th>
+                    <td class="py-2 px-4 border-b" th:text="${task.dueDate}"></td>
+                </tr>
+                <tr>
+                    <th class="py-2 px-4 border-b text-left">Status</th>
+                    <td class="py-2 px-4 border-b" th:text="${task.status}"></td>
+                </tr>
+                <tr>
+                    <th class="py-2 px-4 border-b text-left">Priority</th>
+                    <td class="py-2 px-4 border-b" th:text="${task.priority}"></td>
+                </tr>
+                <tr>
+                    <th class="py-2 px-4 border-b text-left">Category</th>
+                    <td class="py-2 px-4 border-b" th:text="${task.category.name}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="text-center mt-6">
+                <a href="/tasks" class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Back to List</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.tailwindcss.com"></script>
+</body>
+</html>
