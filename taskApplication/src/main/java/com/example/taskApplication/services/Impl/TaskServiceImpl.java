@@ -5,6 +5,7 @@ import com.example.taskApplication.repositories.TaskRepository;
 import com.example.taskApplication.repositories.UserRepository;
 import com.example.taskApplication.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -64,4 +65,41 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findOverdueTasks(username, currentDate);
     }
 
+    @Override
+    public List<Task> getTasksSortedByDueDate(Sort sort) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return taskRepository.findByUserUsername(username, sort);
+    }
+
+    @Override
+    public List<Task> getTasksByStatus(String status) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return taskRepository.findByUserUsernameAndStatus(username, status);
+    }
+
+    @Override
+    public List<Task> getTasksByCategory(Long categoryId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return taskRepository.findByUserUsernameAndCategoryId(username, categoryId);
+    }
+
+    @Override
+    public List<Task> getTasksByFilters(String status, Long categoryId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return taskRepository.findByFilters(username, status, categoryId);
+    }
+    @Override
+    public List<Task> getTasksWithFiltersAndSorting(String status, Long categoryId, Sort sort) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if ((status == null || status.isEmpty()) && categoryId == null) {
+            return taskRepository.findByUserUsername(username, sort);
+        } else if (status == null || status.isEmpty()) {
+            return taskRepository.findByUserUsernameAndCategoryId(username, categoryId, sort);
+        } else if (categoryId == null) {
+            return taskRepository.findByUserUsernameAndStatus(username, status, sort);
+        } else {
+            return taskRepository.findByUserUsernameAndStatusAndCategoryId(username, status, categoryId, sort);
+        }
+    }
 }
