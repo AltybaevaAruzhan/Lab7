@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<div class="flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <div class="bg-gray-800 text-white w-full md:w-1/5 h-screen p-4">
+        <h1 class="text-2xl font-bold mb-6">Admin Panel</h1>
+        <ul>
+            <li><a href="/admin" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
+            <li><a href="/admin/users" class="block py-2 px-4 hover:bg-gray-700">Manage Users</a></li>
+            <li><a href="/admin/tasks" class="block py-2 px-4 hover:bg-gray-700">Manage Tasks</a></li>
+            <li><a href="/admin/categories" class="block py-2 px-4 hover:bg-gray-700">Manage Categories</a></li>
+            <li><a href="/logout" class="block py-2 px-4 hover:bg-gray-700">Logout</a></li>
+        </ul>
+    </div>
+    <!-- Main Content -->
+    <div class="w-full md:w-4/5 p-6">
+        <h2 class="text-3xl font-bold mb-4">Admin Dashboard</h2>
+
+        <!-- Users Section -->
+        <div class="mb-6">
+            <h3 class="text-2xl font-bold mb-2">All Users</h3>
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead>
+                <tr>
+                    <th class="py-2 px-4 border">ID</th>
+                    <th class="py-2 px-4 border">Name</th>
+                    <th class="py-2 px-4 border">Email</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}" class="py-2 px-4 border"></td>
+                    <td th:text="${user.username}" class="py-2 px-4 border"></td>
+                    <td th:text="${user.email}" class="py-2 px-4 border"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="mb-6">
+            <h3 class="text-2xl font-bold mb-2">Tasks</h3>
+            <div class="mb-4">
+                <input type="text" placeholder="Search Tasks" class="p-2 border border-gray-300 rounded w-full" />
+            </div>
+            <table class="min-w-full bg-white border border-gray-200">
+                <thead>
+                <tr>
+                    <th class="py-2 px-4 border">Title</th>
+                    <th class="py-2 px-4 border">Category</th>
+                    <th class="py-2 px-4 border">Assigned To</th>
+                    <th class="py-2 px-4 border">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${tasks}">
+                    <td th:text="${task.title}" class="py-2 px-4 border"></td>
+                    <td th:text="${task.category.name}" class="py-2 px-4 border"></td>
+                    <td th:text="${task.user.username}" class="py-2 px-4 border"></td>
+                    <td class="py-2 px-4 border">
+                        <a th:href="@{/admin/tasks/{id}/notify(id=${task.id})}" class="text-red-500 hover:underline">Notify</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="mt-4 flex justify-center">
+                <a href="#" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Previous</a>
+                <a href="#" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">1</a>
+                <a href="#" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Next</a>
+            </div>
+        </div>
+
+        <!-- Categories Section -->
+        <div class="mb-6">
+            <h3 class="text-2xl font-bold mb-2">Categories</h3>
+            <ul>
+                <li th:each="category : ${categories}" class="py-2 px-4 border-b">
+                    <span th:text="${category.name}"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+</html>
