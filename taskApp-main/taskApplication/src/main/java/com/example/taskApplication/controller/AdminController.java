@@ -1,23 +1,28 @@
 package com.example.taskApplication.controller;
 
+import com.example.taskApplication.models.PasswordUpdateForm;
 import com.example.taskApplication.models.Task;
 import com.example.taskApplication.models.User;
 import com.example.taskApplication.models.Category;
-import com.example.taskApplication.services.Impl.CategoryServiceImpl;
-import com.example.taskApplication.services.Impl.EmailServiceImpl;
-import com.example.taskApplication.services.Impl.TaskServiceImpl;
-import com.example.taskApplication.services.Impl.UserServiceImpl;
+import com.example.taskApplication.security.CustomUserDetails;
+import com.example.taskApplication.services.Impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +30,8 @@ import java.util.Optional;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private UserServiceImpl userService;
 
@@ -37,12 +43,40 @@ public class AdminController {
 
     @Autowired
     private CategoryServiceImpl categoryService;
+    @Autowired
+    private FileStorageServiceImpl fileStorageService;
+
+
+    public AdminController(UserServiceImpl userService, TaskServiceImpl taskService, CategoryServiceImpl categoryService) {
+        this.userService = userService;
+        this.taskService = taskService;
+        this.categoryService = categoryService;
+    }
+
     @GetMapping()
-    public String getAdminDashboard(Model model) {
+    public String getAdminDashboard(@RequestParam(defaultValue = "0") int currentPage, Model model) {
         List<User> users = userService.getAllUsers();
+        List<Category> categories = categoryService.findAllCategories();
+        Page<Task> tasks = taskService.getPaginatedTasks(PageRequest.of(currentPage, 10));
+
+        System.out.println("Tasks: " + tasks.getContent());
+
+        model.addAttribute("users", users);
+        model.addAttribute("categories", categories);
+        model.addAttribute("tasks", tasks.getContent());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", tasks.getTotalPages());
+        return "admin/dashboard";
+    }
+
+
+    @GetMapping("/users/search")
+    public String searchUsers(@RequestParam String query, Model model) {
+        List<User> users = userService.searchUsers(query);
         model.addAttribute("users", users);
         return "admin/dashboard";
     }
+
 
     @GetMapping("/users")
     public String viewAllUsers(@RequestParam(defaultValue = "0") int page, Model model) {
@@ -79,11 +113,10 @@ public class AdminController {
         Pageable pageable = PageRequest.of(page, 10);
         Page<Task> tasks = taskService.getPaginatedTasks(pageable);
 
-        // Check and handle null createdBy for tasks
         tasks.getContent().forEach(task -> {
             if (task.getCreatedBy() == null) {
-                User fallbackUser = new User(); // Default constructor
-                fallbackUser.setUsername("Aruzhan"); // Set username explicitly
+                User fallbackUser = new User();
+                fallbackUser.setUsername("Aruzhan");
                 task.setCreatedBy(fallbackUser);
             }
         });
@@ -94,25 +127,7 @@ public class AdminController {
         return "admin/tasks";
     }
 
-    //    @GetMapping("/user/{id}/tasks")
-//    public String viewUserTasks(@PathVariable Long id,
-//                                @RequestParam(defaultValue = "0") int page,
-//                                Model model) {
-//        Pageable pageable = PageRequest.of(page, 10);
-//        Page<Task> tasks = taskService.getTasksByUserId(id, pageable);
-//        User user = userService.getUserById(id).orElse(null);
-//
-//        if (user == null) {
-//            return "redirect:/admin/users"; // Redirect if user is not found
-//        }
-//
-//        model.addAttribute("tasks", tasks.getContent());
-//        model.addAttribute("currentPage", page);
-//        model.addAttribute("totalPages", tasks.getTotalPages());
-//        model.addAttribute("user", user);
-//
-//        return "admin/userTasks";
-//    }
+
     @GetMapping("/tasks/create")
     public String showCreateTaskForm(Model model) {
         model.addAttribute("task", new Task());
@@ -142,7 +157,7 @@ public class AdminController {
 
             User assignedTo = userService.getUserById(assignedToUserId)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid assigned user ID: " + assignedToUserId));
-            task.setCreatedBy(createdBy); // This is critical to prevent the NULL error
+            task.setCreatedBy(createdBy);
             task.setAssignedTo(assignedTo);
             taskService.saveTaskWithUsers(task, createdBy, assignedTo);
             redirectAttributes.addFlashAttribute("successMessage", "Task created successfully!");
@@ -172,6 +187,16 @@ public class AdminController {
         categoryService.saveCategory(category);
         return "redirect:/admin/categories";
     }
+    @PostMapping("/categories/{categoryId}/delete")
+    public String deleteCategory(@PathVariable("categoryId") Long categoryId, Model model) {
+        try {
+            categoryService.deleteCategory(categoryId);
+            model.addAttribute("successMessage", "Category deleted successfully.");
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Error deleting category: " + e.getMessage());
+        }
+        return "redirect:/admin/categories";
+    }
 
 
 
@@ -182,14 +207,13 @@ public class AdminController {
             System.out.println("Task not found for ID: " + taskId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found");
         }
-        // Add the specific task to the model
         model.addAttribute("task", task);
 
-        // Add the assigned user or a default user to the model
         model.addAttribute("assignedUser", task.getAssignedTo() != null ? task.getAssignedTo() : new User());
 
-        return "admin/notifications"; // Ensure this template exists in the correct directory
+        return "admin/notifications";
     }
+
 
 
 
@@ -244,5 +268,82 @@ public class AdminController {
         taskService.deleteTaskById(id); // Implement this method in the service
         return "redirect:/admin/tasks";
     }
+    @GetMapping("/profile")
+    public String viewProfile(Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+        model.addAttribute("user", user);
+        return "admin/profile";
+    }
+    @PostMapping("/profile/edit")
+    public String editProfile(@ModelAttribute User updatedUser, Principal principal, RedirectAttributes redirectAttributes) {
+        User currentUser = userService.findByUsername(principal.getName());
+
+        currentUser.setUsername(updatedUser.getUsername());
+        currentUser.setEmail(updatedUser.getEmail());
+
+        userService.saveUserPreservingPassword(currentUser);
+
+        Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails updatedUserDetails = new CustomUserDetails(currentUser);
+        UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                updatedUserDetails, currentAuth.getCredentials(), updatedUserDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+        redirectAttributes.addFlashAttribute("success", "Profile updated successfully.");
+
+        return "redirect:/admin/profile";
+    }
+
+    @PostMapping("/profile/change-password")
+    public String updatePassword(@ModelAttribute("passwordForm") PasswordUpdateForm passwordForm,
+                                 Principal principal,
+                                 RedirectAttributes redirectAttributes) {
+        User currentUser = userService.findByUsername(principal.getName());
+
+        if (!passwordEncoder.matches(passwordForm.getCurrentPassword(), currentUser.getPassword())) {
+            redirectAttributes.addFlashAttribute("error", "Current password is incorrect.");
+            return "redirect:/admin/profile";
+        }
+
+        if (!passwordForm.getNewPassword().equals(passwordForm.getConfirmPassword())) {
+            redirectAttributes.addFlashAttribute("error", "New password and confirmation do not match.");
+            return "redirect:/admin/profile";
+        }
+
+
+        currentUser.setPassword(passwordForm.getNewPassword());
+        userService.saveUser(currentUser);
+
+//        SecurityContextHolder.clearContext();
+
+        redirectAttributes.addFlashAttribute("success", "Password updated successfully. Please log in again.");
+        return "redirect:/signin";
+    }
+
+    @PostMapping("/profile/upload-photo")
+    public String uploadPhoto(@RequestParam("photo") MultipartFile file,
+                              Principal principal,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            // Fetch the user
+            User user = userService.findByUsername(principal.getName());
+
+            // Update only the photo field
+            String photoUrl = fileStorageService.saveFile(file);
+            user.setPhoto(photoUrl);
+
+            // Use the method that preserves the password
+            userService.saveUserPreservingPassword(user);
+
+            redirectAttributes.addFlashAttribute("success", "Profile photo updated successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Failed to upload photo.");
+        }
+
+        return "redirect:/admin/profile";
+    }
+
+
+
 
 }

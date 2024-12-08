@@ -23,7 +23,7 @@ public class EmailServiceImpl implements EmailService {
             message.setTo(to);
             message.setSubject(subject);
             message.setText(body);
-            message.setFrom("aruzhan.altybaeva15@gmail.com"); // Set a valid sender email address
+            message.setFrom("aruzhan.altybaeva15@gmail.com");
             mailSender.send(message);
         } catch (Exception e) {
             System.err.println("Error while sending email: " + e.getMessage());

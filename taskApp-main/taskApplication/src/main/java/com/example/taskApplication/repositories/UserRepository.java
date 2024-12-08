@@ -3,15 +3,15 @@ package com.example.taskApplication.repositories;
 import com.example.taskApplication.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByUsername(String username);
-
-    Optional<User> findUserById(Long id); // Changed return type to Optional
+    List<User> findByUsernameContainingIgnoreCaseOrEmailContainingIgnoreCase(String username, String email);
+    Optional<User> findUserById(Long id);
 
     boolean existsByUsername(String username);
 
@@ -21,5 +21,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> getAllUsers();
 
     Optional<User> findByEmail(String email);
+    @Query("SELECT u FROM User u WHERE u.username = :username")
+    Optional<User> findByUsername(@Param("username") String username);
+
 }
 

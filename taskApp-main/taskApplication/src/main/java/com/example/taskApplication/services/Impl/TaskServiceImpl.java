@@ -35,7 +35,10 @@ public class TaskServiceImpl implements TaskService {
         this.categoryRepository = categoryRepository;
         this.mailSender = mailSender;
     }
-
+    @Override
+    public Page<Task> getAllTasks(Pageable pageable) {
+        return taskRepository.findAll(pageable);
+    }
     @Override
     public List<Task> findAllTasks() {
         return taskRepository.findAll();
@@ -96,6 +99,10 @@ public class TaskServiceImpl implements TaskService {
         mailMessage.setText(message);
         mailSender.send(mailMessage);
     }
+    @Override
+    public Page<Task> getTasksForAssignedUser(String username, Pageable pageable) {
+        return taskRepository.findByAssignedToUsername(username, pageable);
+    }
 
     @Override
     public void deleteTaskById(Long id) {
@@ -111,7 +118,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> findOverdueTasks() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Date currentDate = new Date(); // Current date
+        Date currentDate = new Date();
         return taskRepository.findOverdueTasks(username, currentDate);
     }
 

@@ -55,7 +55,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t WHERE t.assignedTo.username = :username")
     Page<Task> findByAssignedToUsername(@Param("username") String username, Pageable pageable);
 
-    // Search and Pagination: Filter tasks by title or description
     @Query("SELECT t FROM Task t WHERE t.assignedTo.username = :username " +
             "AND (LOWER(t.title) LIKE LOWER(CONCAT('%', :search, '%')) " +
             "OR LOWER(t.description) LIKE LOWER(CONCAT('%', :search, '%')))")

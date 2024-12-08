@@ -23,6 +23,6 @@ public class PasswordResetService {
         String newPassword = UUID.randomUUID().toString().substring(0, 8);
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-        return newPassword; // In real-world applications, send this via email.
+        return newPassword;
     }
 }

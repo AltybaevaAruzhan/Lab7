@@ -27,6 +27,7 @@ public class AuthController {
         this.userService = userService;
     }
 
+
     @GetMapping("signup")
     public String signupForm(Model model) {
         model.addAttribute("user", new User());
@@ -45,7 +46,6 @@ public class AuthController {
             model.addAttribute("error", "Passwords do not match");
             return "auth/signup";
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(User.Role.USER);
         userService.saveUser(user);
         return "redirect:/signin?success";

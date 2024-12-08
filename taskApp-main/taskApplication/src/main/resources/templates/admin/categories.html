@@ -47,9 +47,10 @@
                     <td class="py-2 px-4 border-b" th:text="${category.id}">1</td>
                     <td class="py-2 px-4 border-b" th:text="${category.name}">Category Name</td>
                     <td class="py-2 px-4 border-b">
-                        <form th:action="@{/admin/categories/{id}/delete(id=${category.id})}" method="post" class="inline">
+                        <form th:action="@{/admin/categories/{categoryId}/delete(categoryId=${category.id})}" method="post" class="inline">
                             <button type="submit" class="text-red-500 hover:underline">Delete</button>
                         </form>
+
                     </td>
                 </tr>
 

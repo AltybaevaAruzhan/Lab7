@@ -15,12 +15,14 @@ public interface TaskService {
     List <Task> getTasksForCurrentUser();
     void updateTask(Long id, Task taskDetails);
     void notifyUser(Long taskId, String message);
+    Page<Task> getTasksForAssignedUser(String username, Pageable pageable);
     Task saveTask(Task task);
     void deleteTaskById(Long id);
     Task findTaskById(Long id);
     List<Task> findTasksByCategoryAndStatus(String category, String status);
     List<Task> findOverdueTasks();
     List<Task> findAllTasks();
+    Page<Task> getAllTasks(Pageable pageable);
     Task saveTaskWithUsers(Task task, User createdBy, User assignedTo);
     Page<Task> getTasksForAdmin(Pageable pageable);
     Page<Task> getPaginatedTasks(Pageable pageable);
