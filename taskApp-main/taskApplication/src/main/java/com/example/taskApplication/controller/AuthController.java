@@ -1,7 +1,9 @@
 package com.example.taskApplication.controller;
 
 import com.example.taskApplication.models.User;
+import com.example.taskApplication.security.PasswordGenerator;
 import com.example.taskApplication.security.PasswordResetService;
+import com.example.taskApplication.services.Impl.EmailServiceImpl;
 import com.example.taskApplication.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,8 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @Autowired
+    private EmailServiceImpl emailService;
     public AuthController(UserService userService) {
         this.userService = userService;
     }
@@ -37,19 +40,28 @@ public class AuthController {
     @PostMapping("signup")
     public String signup(@Valid @ModelAttribute("user") User user,
                          BindingResult result,
-                         @RequestParam("confirmPassword") String confirmPassword,
                          Model model) {
         if (result.hasErrors()) {
             return "auth/signup";
         }
-        if (!user.getPassword().equals(confirmPassword)) {
-            model.addAttribute("error", "Passwords do not match");
+
+        String randomPassword = PasswordGenerator.generateRandomPassword();
+        try {
+            emailService.sendEmail(user.getEmail(), "Password", randomPassword);
+        } catch (Exception e) {
+            model.addAttribute("error", "Failed to send email. Please try again.");
             return "auth/signup";
         }
+
+        user.setPassword(passwordEncoder.encode(randomPassword));
         user.setRole(User.Role.USER);
+
         userService.saveUser(user);
+
         return "redirect:/signin?success";
     }
+
+
 
     @GetMapping("signin")
     public String signin() {

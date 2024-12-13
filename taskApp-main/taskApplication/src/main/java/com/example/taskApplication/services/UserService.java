@@ -21,5 +21,6 @@ public interface UserService {
     Page<User> getPaginatedUsers(Pageable pageable);
     List<User> getAllUsers();
     User findByEmail(String email);
+//    void sendPasswordEmail(String email, String password);
 }
 

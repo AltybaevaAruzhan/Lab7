@@ -44,7 +44,6 @@ public class SecurityConfig {
                         .loginPage("/signin")
                         .loginProcessingUrl("/login")
                         .successHandler((request, response, authentication) -> {
-                            // Redirect based on role
                             var authorities = authentication.getAuthorities();
                             String redirectUrl = authorities.stream()
                                     .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))

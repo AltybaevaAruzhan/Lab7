@@ -20,6 +20,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))
                 ? "/admin"
                 : "/tasks";
+
         response.sendRedirect(redirectUrl);
     }
 }

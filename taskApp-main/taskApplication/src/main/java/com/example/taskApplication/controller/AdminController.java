@@ -314,7 +314,6 @@ public class AdminController {
         currentUser.setPassword(passwordForm.getNewPassword());
         userService.saveUser(currentUser);
 
-//        SecurityContextHolder.clearContext();
 
         redirectAttributes.addFlashAttribute("success", "Password updated successfully. Please log in again.");
         return "redirect:/signin";
@@ -325,14 +324,11 @@ public class AdminController {
                               Principal principal,
                               RedirectAttributes redirectAttributes) {
         try {
-            // Fetch the user
             User user = userService.findByUsername(principal.getName());
 
-            // Update only the photo field
             String photoUrl = fileStorageService.saveFile(file);
             user.setPhoto(photoUrl);
 
-            // Use the method that preserves the password
             userService.saveUserPreservingPassword(user);
 
             redirectAttributes.addFlashAttribute("success", "Profile photo updated successfully.");

@@ -22,6 +22,7 @@ public class UserServiceImpl implements UserService {
     private final JavaMailSender mailSender;
 
     @Autowired
+
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -51,9 +52,9 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public User saveUser(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
+
     public void saveUserPreservingPassword(User updatedUser) {
         User existingUser = userRepository.findById(updatedUser.getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
