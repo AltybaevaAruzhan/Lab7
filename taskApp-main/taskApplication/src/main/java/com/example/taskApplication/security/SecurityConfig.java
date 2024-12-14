@@ -48,7 +48,7 @@ public class SecurityConfig {
                             String redirectUrl = authorities.stream()
                                     .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))
                                     ? "/admin"
-                                    : "/tasks";
+                                    : "/user/tasks";
                             response.sendRedirect(redirectUrl);
                         })
                         .failureUrl("/signin?error=true")

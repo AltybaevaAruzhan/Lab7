@@ -11,8 +11,8 @@
   <div class="container mx-auto flex justify-between items-center">
     <a class="text-xl font-bold" href="#">Task Management App</a>
     <div>
-      <a class="mr-4" href="/tasks">Tasks</a>
-      <a class="mr-4" href="/profile">Profile</a>
+      <a class="mr-4" href="/user/tasks">Tasks</a>
+      <a class="mr-4" href="/user/profile">Profile</a>
       <a href="/logout">Logout</a>
     </div>
   </div>
@@ -50,7 +50,7 @@
     <div class="mt-4 text-center">
       <ul class="pagination">
         <li th:each="i : ${#numbers.sequence(1, totalPages)}" class="inline-block mx-1">
-          <a th:classappend="${i == currentPage} ? 'bg-blue-500 text-white'" th:href="@{/tasks(page=${i})}" class="px-3 py-1 border rounded">
+          <a th:classappend="${i == currentPage} ? 'bg-blue-500 text-white'" th:href="@{/user/tasks(page=${i})}" class="px-3 py-1 border rounded">
             <span th:text="${i}"></span>
           </a>
         </li>
