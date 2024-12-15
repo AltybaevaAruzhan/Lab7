@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/taskApp-main.iml" filepath="$PROJECT_DIR$/.idea/taskApp-main.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/taskApplication.iml" filepath="$PROJECT_DIR$/.idea/taskApplication.iml" />
+>>>>>>> taskApp/main
     </modules>
   </component>
 </project>

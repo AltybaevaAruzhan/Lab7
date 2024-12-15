@@ -9,7 +9,10 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+<<<<<<< HEAD
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+=======
+>>>>>>> taskApp/main
         </processorPath>
         <module name="taskApplication" />
       </profile>
