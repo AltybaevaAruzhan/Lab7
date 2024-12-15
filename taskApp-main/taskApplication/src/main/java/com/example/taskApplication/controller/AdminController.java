@@ -22,10 +22,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/admin")
@@ -54,20 +52,38 @@ public class AdminController {
     }
 
     @GetMapping()
-    public String getAdminDashboard(@RequestParam(defaultValue = "0") int currentPage, Model model) {
-        List<User> users = userService.getAllUsers();
-        List<Category> categories = categoryService.findAllCategories();
-        Page<Task> tasks = taskService.getPaginatedTasks(PageRequest.of(currentPage, 10));
+    public String getAdminDashboard(
+            @RequestParam(defaultValue = "0") int userPage,
+            @RequestParam(defaultValue = "0") int taskPage,
+            @RequestParam(defaultValue = "0") int categoryPage,
+            Model model) {
 
-        System.out.println("Tasks: " + tasks.getContent());
+        int pageSize = 5;
+        Page<User> userPageData = userService.getPaginatedUsers(PageRequest.of(userPage, 5));
+        List<User> users = userPageData.getContent();
+
+        Page<Task> taskPageData = taskService.getPaginatedTasks(PageRequest.of(taskPage, 5));
+        List<Task> tasks = taskPageData.getContent();
+
+        Page<Category> categoryPageData = categoryService.getPaginatedCategories(PageRequest.of(categoryPage, 5));
+        List<Category> categories = categoryPageData.getContent();
 
         model.addAttribute("users", users);
+        model.addAttribute("userCurrentPage", userPage);
+        model.addAttribute("userTotalPages", userPageData.getTotalPages());
+
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("taskCurrentPage", taskPage);
+        model.addAttribute("taskTotalPages", taskPageData.getTotalPages());
+
         model.addAttribute("categories", categories);
-        model.addAttribute("tasks", tasks.getContent());
-        model.addAttribute("currentPage", currentPage);
-        model.addAttribute("totalPages", tasks.getTotalPages());
+        model.addAttribute("categoryCurrentPage", categoryPage);
+        model.addAttribute("categoryTotalPages", categoryPageData.getTotalPages());
+
         return "admin/dashboard";
     }
+
+
 
 
     @GetMapping("/users/search")
@@ -106,6 +122,33 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error deleting user: " + e.getMessage());
         }
         return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/{id}/update")
+    public String showEditUserForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.getUserById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
+            model.addAttribute("users", user);
+            return "admin/updateUser";
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/admin/users";
+        }
+    }
+
+    @PostMapping("/users/{id}/update")
+    public String updateUser(@PathVariable Long id,
+                             @ModelAttribute("user") User updatedUser,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            User updated = userService.updateUser(id, updatedUser);
+            redirectAttributes.addFlashAttribute("successMessage", "User updated successfully!");
+            return "redirect:/admin/users";
+        } catch (IllegalArgumentException ex) {
+            redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());
+            return "redirect:/admin/users";
+        }
     }
 
     @GetMapping("/tasks")
@@ -148,7 +191,6 @@ public class AdminController {
                 return "redirect:/signin";
             }
 
-            // Fetch the user by username
             String username = principal.getName();
             System.out.println("Authenticated Username: " + username);
 
@@ -168,13 +210,6 @@ public class AdminController {
             return "redirect:/admin/tasks/create";
         }
     }
-
-
-
-
-
-
-
     @GetMapping("/categories")
     public String viewAllCategories(Model model) {
         List<Category> categories = categoryService.findAllCategories();
@@ -198,8 +233,6 @@ public class AdminController {
         return "redirect:/admin/categories";
     }
 
-
-
     @GetMapping("/tasks/{taskId}/notify")
     public String showNotificationPage(@PathVariable Long taskId, Model model) {
         Task task = taskService.findTaskById(taskId);
@@ -213,10 +246,6 @@ public class AdminController {
 
         return "admin/notifications";
     }
-
-
-
-
 
     @PostMapping("/tasks/{taskId}/notify")
     public String sendNotification(@PathVariable Long taskId,
@@ -241,7 +270,6 @@ public class AdminController {
 
         return "redirect:/admin/tasks";
     }
-
 
     @GetMapping("/tasks/{id}/edit")
     public String showEditTaskForm(@PathVariable Long id, Model model) {
@@ -310,11 +338,8 @@ public class AdminController {
             return "redirect:/admin/profile";
         }
 
-
         currentUser.setPassword(passwordForm.getNewPassword());
         userService.saveUser(currentUser);
-
-
         redirectAttributes.addFlashAttribute("success", "Password updated successfully. Please log in again.");
         return "redirect:/signin";
     }
@@ -325,12 +350,9 @@ public class AdminController {
                               RedirectAttributes redirectAttributes) {
         try {
             User user = userService.findByUsername(principal.getName());
-
             String photoUrl = fileStorageService.saveFile(file);
             user.setPhoto(photoUrl);
-
             userService.saveUserPreservingPassword(user);
-
             redirectAttributes.addFlashAttribute("success", "Profile photo updated successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Failed to upload photo.");

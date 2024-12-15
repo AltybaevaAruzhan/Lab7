@@ -62,8 +62,6 @@ public class TaskController {
         return "user/list";
     }
 
-
-
     @GetMapping("/task/{id}")
     public String getTaskDetails(@PathVariable long id, Model model) {
         Task task = taskService.findTaskById(id);

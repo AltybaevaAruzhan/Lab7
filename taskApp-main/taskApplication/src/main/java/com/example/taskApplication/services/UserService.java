@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface UserService {
     void saveUserPreservingPassword(User updatedUser);
     User saveUser(User user);
+    User updateUser(Long id, User user);
     User findByUsername(String username);
     Optional<User> getUserById(Long id);
     Optional<User> getUserByUsername(String username);

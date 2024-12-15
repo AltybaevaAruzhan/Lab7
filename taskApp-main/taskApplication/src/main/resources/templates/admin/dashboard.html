@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -13,13 +14,14 @@
         <h1 class="text-2xl font-bold mb-6">Admin Panel</h1>
         <ul>
             <li><a href="/admin" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
+            <li><a href="/admin/profile" class="block py-2 px-4 hover:bg-gray-700">Profile</a></li>
             <li><a href="/admin/users" class="block py-2 px-4 hover:bg-gray-700">Manage Users</a></li>
             <li><a href="/admin/tasks" class="block py-2 px-4 hover:bg-gray-700">Manage Tasks</a></li>
             <li><a href="/admin/categories" class="block py-2 px-4 hover:bg-gray-700">Manage Categories</a></li>
             <li><a href="/logout" class="block py-2 px-4 hover:bg-gray-700">Logout</a></li>
-            <li><a href="/admin/profile" class="block py-2 px-4 hover:bg-gray-700">Profile</a></li>
         </ul>
     </div>
+
     <!-- Main Content -->
     <div class="w-full md:w-4/5 p-6">
         <h2 class="text-3xl font-bold mb-4">Admin Dashboard</h2>
@@ -27,6 +29,11 @@
         <!-- Users Section -->
         <div class="mb-6">
             <h3 class="text-2xl font-bold mb-2">All Users</h3>
+            <a href="/admin/users"
+               class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                View All Users
+            </a>
+
             <table class="min-w-full bg-white border border-gray-200">
                 <thead>
                 <tr>
@@ -43,14 +50,25 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="mt-4 flex justify-center">
+                <a th:if="${userCurrentPage > 0}"
+                   th:href="@{/admin(userPage=${userCurrentPage - 1}, taskPage=${taskCurrentPage}, categoryPage=${categoryCurrentPage})}"
+                   class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Previous</a>
+                <a th:each="i : ${#numbers.sequence(0, userTotalPages - 1)}"
+                   th:href="@{/admin(userPage=${i}, taskPage=${taskCurrentPage}, categoryPage=${categoryCurrentPage})}"
+                   th:classappend="${i == userCurrentPage} ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'"
+                   class="px-4 py-2 rounded mx-1"
+                   th:text="${i + 1}"></a>
+                <a th:if="${userCurrentPage + 1 < userTotalPages}"
+                   th:href="@{/admin(userPage=${userCurrentPage + 1}, taskPage=${taskCurrentPage}, categoryPage=${categoryCurrentPage})}"
+                   class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Next</a>
+            </div>
+
         </div>
 
         <!-- Tasks Section -->
         <div class="mb-6">
             <h3 class="text-2xl font-bold mb-2">Tasks</h3>
-            <div class="mb-4">
-                <input type="text" placeholder="Search Tasks" class="p-2 border border-gray-300 rounded w-full" />
-            </div>
             <table class="min-w-full bg-white border border-gray-200">
                 <thead>
                 <tr>
@@ -71,14 +89,21 @@
                 </tr>
                 </tbody>
             </table>
-            <!-- Pagination -->
             <div class="mt-4 flex justify-center">
-                <a th:if="${currentPage > 0}" th:href="@{/admin/dashboard(currentPage=${currentPage - 1})}" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Previous</a>
-                <span class="px-4 py-2 bg-gray-100 rounded mx-1" th:text="'Page ' + (currentPage + 1) + ' of ' + totalPages"></span>
-                <a th:if="${currentPage + 1 < totalPages}" th:href="@{/admin/dashboard(currentPage=${currentPage + 1})}" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Next</a>
+                <a th:if="${taskCurrentPage > 0}"
+                   th:href="@{/admin(userPage=${userCurrentPage}, taskPage=${taskCurrentPage - 1}, categoryPage=${categoryCurrentPage})}"
+                   class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Previous</a>
+                <a th:each="i : ${#numbers.sequence(0, taskTotalPages - 1)}"
+                   th:href="@{/admin(userPage=${userCurrentPage}, taskPage=${i}, categoryPage=${categoryCurrentPage})}"
+                   th:classappend="${i == taskCurrentPage} ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'"
+                   class="px-4 py-2 rounded mx-1"
+                   th:text="${i + 1}"></a>
+                <a th:if="${taskCurrentPage + 1 < taskTotalPages}"
+                   th:href="@{/admin(userPage=${userCurrentPage}, taskPage=${taskCurrentPage + 1}, categoryPage=${categoryCurrentPage})}"
+                   class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Next</a>
             </div>
-        </div>
 
+        </div>
 
         <!-- Categories Section -->
         <div class="mb-6">
@@ -88,6 +113,19 @@
                     <span th:text="${category.name}"></span>
                 </li>
             </ul>
+            <div class="mt-4 flex justify-center">
+                <a th:if="${categoryCurrentPage > 0}"
+                   th:href="@{/admin(userPage=${userCurrentPage}, taskPage=${taskCurrentPage}, categoryPage=${categoryCurrentPage - 1})}"
+                   class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Previous</a>
+                <a th:each="i : ${#numbers.sequence(0, categoryTotalPages - 1)}"
+                   th:href="@{/admin(userPage=${userCurrentPage}, taskPage=${taskCurrentPage}, categoryPage=${i})}"
+                   th:classappend="${i == categoryCurrentPage} ? 'bg-blue-500 text-white' : 'bg-gray-300 hover:bg-gray-400'"
+                   class="px-4 py-2 rounded mx-1"
+                   th:text="${i + 1}"></a>
+                <a th:if="${categoryCurrentPage + 1 < categoryTotalPages}"
+                   th:href="@{/admin(userPage=${userCurrentPage}, taskPage=${taskCurrentPage}, categoryPage=${categoryCurrentPage + 1})}"
+                   class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded mx-1">Next</a>
+            </div>
         </div>
     </div>
 </div>

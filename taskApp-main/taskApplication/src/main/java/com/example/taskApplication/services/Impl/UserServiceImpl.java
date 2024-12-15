@@ -33,6 +33,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.getAllUsers();
     }
     @Override
+    public Page<User> getPaginatedUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    @Override
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
@@ -54,6 +59,22 @@ public class UserServiceImpl implements UserService {
     public User saveUser(User user) {
         return userRepository.save(user);
     }
+    @Override
+    public User updateUser(Long id, User user) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + id));
+
+        existingUser.setUsername(user.getUsername());
+        existingUser.setEmail(user.getEmail());
+        existingUser.setRole(user.getRole());
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        return userRepository.save(existingUser);
+    }
+
 
     public void saveUserPreservingPassword(User updatedUser) {
         User existingUser = userRepository.findById(updatedUser.getId())
@@ -88,10 +109,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isUsernameTaken(String username) {
         return userRepository.existsByUsername(username);
-    }
-    @Override
-    public Page<User> getPaginatedUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
     }
 
 
