@@ -49,4 +49,15 @@ This **Task Management Application** is a Spring Boot-based web application that
 - **Email**: JavaMail API for notifications and password resets
 - **File Storage**: Local file system storage
 - **Build Tool**: Maven
+![Снимок экрана 2024-12-18 052440](https://github.com/user-attachments/assets/f607f070-0e30-415d-ba7e-f1896e945e24)
+![Снимок экрана 2024-12-18 052457](https://github.com/user-attachments/assets/e9b68553-2c3b-4ca0-91ff-def1917bfdb1)
+### **Admin Page**
+![Снимок экрана 2024-12-18 052520](https://github.com/user-attachments/assets/c67a0414-df25-4eb9-bb02-a644220ecc64)
+![Снимок экрана 2024-12-18 052529](https://github.com/user-attachments/assets/70d4dd9d-6c88-441e-9da8-e41f7e556320)
+![Снимок экрана 2024-12-18 052537](https://github.com/user-attachments/assets/70e34ed3-a356-41f3-9580-834b465fb133)
+![Снимок экрана 2024-12-18 052544](https://github.com/user-attachments/assets/065e7a8a-d278-47a6-a5b9-e99133054c32)
+![Снимок экрана 2024-12-18 053426](https://github.com/user-attachments/assets/e23cfdeb-15fa-4b86-a43a-5cca6163d0ab)
+### **User Page**
+![Снимок экрана 2024-12-18 052611](https://github.com/user-attachments/assets/9881ed8a-5eb9-46e0-b7ae-184a14184396)
+![Снимок экрана 2024-12-18 053321](https://github.com/user-attachments/assets/a49a8765-d583-4e45-8037-3d07427b4cdd)
 
